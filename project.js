@@ -27,168 +27,216 @@ export class Project extends Scene {
 
     make_control_panel() {
         this.key_triggered_button("F", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 1;
             } else {
                 this.model.cube.F();
             }
         });
         this.key_triggered_button("F'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -1;
             } else {
                 this.model.cube.Fi();
             }
         });
         this.key_triggered_button("B", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 2;
             } else {
                 this.model.cube.B();
             }
         });
         this.key_triggered_button("B'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -2;
             } else {
                 this.model.cube.Bi();
             }
         });
         this.key_triggered_button("U", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 3;
             } else {
                 this.model.cube.U();
             }
         });
         this.key_triggered_button("U'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -3;
             } else {
                 this.model.cube.Ui();
             }
         });
         this.key_triggered_button("D", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 4;
             } else {
                 this.model.cube.D();
             }
         });
         this.key_triggered_button("D'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -4;
             } else {
                 this.model.cube.Di();
             }
         });
         this.key_triggered_button("L", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 5;
             } else {
                 this.model.cube.L();
             }
         });
         this.key_triggered_button("L'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -5;
             } else {
                 this.model.cube.Li();
             }
         });
         this.key_triggered_button("R", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 6;
             } else {
                 this.model.cube.R();
             }
         });
         this.key_triggered_button("R'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -6;
             } else {
                 this.model.cube.Ri();
             }
         });
         this.key_triggered_button("M", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 7;
             } else {
                 this.model.cube.M();
             }
         });
         this.key_triggered_button("M'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -7;
             } else {
                 this.model.cube.Mi();
             }
         });
         this.key_triggered_button("E", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 8;
             } else {
                 this.model.cube.E();
             }
         });
         this.key_triggered_button("E'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -8;
             } else {
                 this.model.cube.Ei();
             }
         });
         this.key_triggered_button("S", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 9;
             } else {
                 this.model.cube.S();
             }
         });
         this.key_triggered_button("S'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -9;
             } else {
                 this.model.cube.Si();
             }
         });
         this.key_triggered_button("x", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 10;
             } else {
                 this.model.cube.x();
             }
         });
         this.key_triggered_button("x'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -10;
             } else {
                 this.model.cube.xi();
             }
         });
         this.key_triggered_button("y", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 11;
             } else {
                 this.model.cube.y();
             }
         });
         this.key_triggered_button("y'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -11;
             } else {
                 this.model.cube.yi();
             }
         });
         this.key_triggered_button("z", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = 12;
             } else {
                 this.model.cube.z();
             }
         });
         this.key_triggered_button("z'", ["="], () => {
-            if(this.smoothRotations) {
+            if(this.model.rotating) {
+                return;
+            } else if(this.smoothRotations) {
                 this.model.rotating = -12;
             } else {
                 this.model.cube.zi();
