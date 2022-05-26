@@ -499,7 +499,8 @@ const Model = model.Model = class Model {
                     } else {
                         init_rotation = Mat4.rotation(angle, Math.abs(this.rotation_buffer.stickers[face][i][j].x), Math.abs(this.rotation_buffer.stickers[face][i][j].y), Math.abs(this.rotation_buffer.stickers[face][i][j].z));
                     }
-                    this.stickers[face][i][j].draw(context, program_state, init_rotation.times(base_transform).times(translation), this.materials[this.cube[face].grid[i][j].image]);
+                    const sticker_rotation = Mat4.rotation(this.cube[face].grid[i][j].angle * -Math.PI / 2, 0, 0, 1);
+                    this.stickers[face][i][j].draw(context, program_state, init_rotation.times(base_transform).times(translation).times(sticker_rotation), this.materials[this.cube[face].grid[i][j].image]);
                 }
             }
         });
