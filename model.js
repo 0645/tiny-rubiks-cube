@@ -13,10 +13,10 @@ const model = {};
 export {model};
 
 const Model = model.Model = class Model {
-    constructor(n, Shader) {
-        this.n = n;
+    constructor(cube, materials) {
         this.rotating = 0;
-        this.cube = new Rubiks(n);
+        this.cube = cube;
+        this.n = this.cube.n;
 
         this.faces = ["front", "back", "top", "bottom", "left", "right"];
         this.angles = {
@@ -26,7 +26,7 @@ const Model = model.Model = class Model {
             bottom: { x: Math.PI / 2, y: 0, z: -Math.PI / 2 },
             left: { x: 0, y: -Math.PI / 2, z: -Math.PI / 2 },
             right: { x: 0, y: Math.PI / 2, z: -Math.PI / 2 },
-        }
+        };
 
         this.inside = { front: [], back: [], top: [], bottom: [], left: [], right: [] };
         this.render_inside = { front: false, back: false, top: false, bottom: false, left: false, right: false };
@@ -53,16 +53,11 @@ const Model = model.Model = class Model {
         };
         this.resetRotationBuffer();
 
-        this.materials = {
-            temp: new Material(new Shader(), { color: hex_color("#ffffff"), }),
-            inside: new Material(new Shader(), { color: hex_color("#000000"), }),
-            white: new Material(new Shader(), { color: hex_color("#ffffff"), }),
-            yellow: new Material(new Shader(), { color: hex_color("#ffff00"), }),
-            blue: new Material(new Shader(), { color: hex_color("#0000ff"), }),
-            green: new Material(new Shader(), { color: hex_color("#00ff00"), }),
-            orange: new Material(new Shader(), { color: hex_color("#ff8000"), }),
-            red: new Material(new Shader(), { color: hex_color("#ff0000"), }),
-        };
+        this.materials = materials;
+    }
+
+    setMaterials(materials) {
+        this.materials = materials;
     }
 
     resetRotationBuffer() {
