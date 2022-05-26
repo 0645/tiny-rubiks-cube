@@ -44,7 +44,7 @@ class Basic_Look extends Textured_Phong {
                 float sticker_length = 0.95;
                 float temp = 0.05;
                 if(!(f_tex_coord.x > temp && f_tex_coord.x < sticker_length && f_tex_coord.y > temp && f_tex_coord.y < sticker_length)) {
-                    gl_FragColor = vec4( 0.0, 0.0, 0.0, 1.0 ); 
+                    gl_FragColor = vec4( 0, 0, 0, 1.0 ); 
                 }
         } `;
     }
@@ -196,4 +196,14 @@ const colorblind = textures.colorblind = {
     green: new Material(new Colorblind(), { color: hex_color("#00ff00"), texture: new Texture("assets/cb_green.png", "NEAREST"), ...ads }),
     orange: new Material(new Colorblind(), { color: hex_color("#ff8000"), texture: new Texture("assets/cb_orange.png", "NEAREST"), ...ads }),
     red: new Material(new Colorblind(), { color: hex_color("#ff0000"), texture: new Texture("assets/cb_red.png", "NEAREST"), ...ads }),
+};
+
+const supercube = textures.supercube = {
+    inside: new Material(new Textured_Phong(), { color: hex_color("#000000"), }),
+    white: new Material(new Colorblind(), { color: hex_color("#ffffff"), texture: new Texture("assets/arrow.png", "NEAREST"), ...ads }),
+    yellow: new Material(new Colorblind(), { color: hex_color("#ffff00"), texture: new Texture("assets/arrow.png", "NEAREST"), ...ads }),
+    blue: new Material(new Colorblind(), { color: hex_color("#0000ff"), texture: new Texture("assets/arrow.png", "NEAREST"), ...ads }),
+    green: new Material(new Colorblind(), { color: hex_color("#00ff00"), texture: new Texture("assets/arrow.png", "NEAREST"), ...ads }),
+    orange: new Material(new Colorblind(), { color: hex_color("#ff8000"), texture: new Texture("assets/arrow.png", "NEAREST"), ...ads }),
+    red: new Material(new Colorblind(), { color: hex_color("#ff0000"), texture: new Texture("assets/arrow.png", "NEAREST"), ...ads }),
 };

@@ -56,6 +56,7 @@ export class Project extends Scene {
         this.new_line();
         this.key_triggered_button("E", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = 8; else this.model.cube.E(); });
         this.key_triggered_button("E'", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = -8; else this.model.cube.Ei(); });
+        this.key_triggered_button("Supercube (WIP)", ["="], () => this.model.setMaterials(textures.supercube));
         this.new_line();
         this.key_triggered_button("S", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = 9; else this.model.cube.S(); });
         this.key_triggered_button("S'", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = -9; else this.model.cube.Si(); });
