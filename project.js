@@ -20,7 +20,7 @@ export class Project extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
-        this.model = new Model(new Rubiks(3), textures.basic_look);
+        this.model = new Model(new Rubiks(3), textures.supercube);
         this.smoothRotations = true;
         this.initial_camera_location = Mat4.look_at(vec3(16, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0));
     }
@@ -56,7 +56,7 @@ export class Project extends Scene {
         this.new_line();
         this.key_triggered_button("E", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = 8; else this.model.cube.E(); });
         this.key_triggered_button("E'", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = -8; else this.model.cube.Ei(); });
-        this.key_triggered_button("Supercube (WIP)", ["="], () => this.model.setMaterials(textures.supercube));
+        this.key_triggered_button("Supercube", ["="], () => this.model.setMaterials(textures.supercube));
         this.new_line();
         this.key_triggered_button("S", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = 9; else this.model.cube.S(); });
         this.key_triggered_button("S'", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = -9; else this.model.cube.Si(); });

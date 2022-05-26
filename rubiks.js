@@ -3,16 +3,13 @@ const rubiks = {}
 export {rubiks};
 
 const Face = rubiks.Face = class Face {
-    constructor(n, image) {
+    constructor(n, image, angle = 0) {
         this.n = n;
         this.grid = [];
         for(let i = 0; i < this.n; i++) {
             const row = [];
             for(let j = 0; j < this.n; j++) {
-                row.push({
-                    image,
-                    piece: i * n + j
-                });
+                row.push({image, angle: angle % 4});
             }
             this.grid.push(row);
         }
@@ -30,63 +27,77 @@ const Face = rubiks.Face = class Face {
         return result;
     }
 
-    replace_row(row, arr) {
+    replace_row(row, arr, theta = 0) {
         this.grid[row] = arr;
-    }
-
-    replace_col(col, arr) {
         for(let i = 0; i < this.n; i++) {
-            this.grid[i][col] = arr[i];
+            this.grid[row][i].angle += theta;
+            this.grid[row][i].angle %= 4;
         }
     }
 
-    replace_top(arr) {
-        this.replace_row(0, arr);
+    replace_col(col, arr, theta = 0) {
+        for(let i = 0; i < this.n; i++) {
+            this.grid[i][col] = arr[i];
+            this.grid[i][col].angle += theta;
+            this.grid[i][col].angle %= 4;
+        }
     }
 
-    replace_bottom(arr) {
-        this.replace_row(this.n - 1, arr);
+    replace_top(arr, theta = 0) {
+        this.replace_row(0, arr, theta);
     }
 
-    replace_left(arr) {
-        this.replace_col(0, arr);
+    replace_bottom(arr, theta = 0) {
+        this.replace_row(this.n - 1, arr, theta);
     }
 
-    replace_right(arr) {
-        this.replace_col(this.n - 1, arr);
+    replace_left(arr, theta = 0) {
+        this.replace_col(0, arr, theta);
     }
 
-    replace_middle_row(arr) {
-        this.replace_row(Math.floor(this.n / 2), arr);
+    replace_right(arr, theta = 0) {
+        this.replace_col(this.n - 1, arr, theta);
     }
 
-    replace_middle_col(arr) {
-        this.replace_col(Math.floor(this.n / 2), arr);
+    replace_middle_row(arr, theta = 0) {
+        this.replace_row(Math.floor(this.n / 2), arr, theta);
     }
 
-    replace_top_two(arr1, arr2) {
-        this.replace_row(0, arr1);
-        this.replace_row(1, arr2);
+    replace_middle_col(arr, theta = 0) {
+        this.replace_col(Math.floor(this.n / 2), arr, theta);
     }
 
-    replace_bottom_two(arr1, arr2) {
-        this.replace_row(this.n - 1, arr1);
-        this.replace_row(this.n - 2, arr2);
+    replace_top_two(arr1, arr2, theta = 0) {
+        this.replace_row(0, arr1, theta);
+        this.replace_row(1, arr2, theta);
     }
 
-    replace_left_two(arr1, arr2) {
-        this.replace_col(0, arr1);
-        this.replace_col(1, arr2);
+    replace_bottom_two(arr1, arr2, theta = 0) {
+        this.replace_row(this.n - 1, arr1, theta);
+        this.replace_row(this.n - 2, arr2, theta);
     }
 
-    replace_right_two(arr1, arr2) {
-        this.replace_col(this.n - 1, arr1);
-        this.replace_col(this.n - 2, arr2);
+    replace_left_two(arr1, arr2, theta = 0) {
+        this.replace_col(0, arr1, theta);
+        this.replace_col(1, arr2, theta);
+    }
+
+    replace_right_two(arr1, arr2, theta = 0) {
+        this.replace_col(this.n - 1, arr1, theta);
+        this.replace_col(this.n - 2, arr2, theta);
     }
 
     rotate_clockwise() {
         const result = this.grid;
         
+        // Change angles
+        for(let i = 0; i < this.n; i++) {
+            for(let j = 0; j < this.n; j++) {
+                result[i][j].angle++;
+                result[i][j].angle %= 4;
+            }
+        }
+
         // Transpose
         for(let i = 0; i < this.n / 2; i++) {
             for(let j = 0; j < this.n / 2; j++) {
@@ -116,12 +127,12 @@ const Face = rubiks.Face = class Face {
 const Rubiks = rubiks.Rubiks = class Rubiks {
     constructor(n) {
         this.n = n;
-        this.front = new Face(n, 'white');
-        this.back = new Face(n, 'yellow');
-        this.top = new Face(n, 'blue');
-        this.bottom = new Face(n, 'green');
+        this.front = new Face(n, 'white', 1);
+        this.back = new Face(n, 'yellow', 1);
+        this.top = new Face(n, 'blue', 2);
+        this.bottom = new Face(n, 'green', 2);
         this.left = new Face(n, 'orange');
-        this.right = new Face(n, 'red');
+        this.right = new Face(n, 'red', 2);
     }
 
     F() {
@@ -132,10 +143,10 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         const c = this.bottom.get_row(0);
         const d = this.left.get_col(this.n - 1);
 
-        this.right.replace_left(a);
-        this.bottom.replace_top(b.reverse());
-        this.left.replace_right(c);
-        this.top.replace_bottom(d.reverse()); 
+        this.right.replace_left(a, 1);
+        this.bottom.replace_top(b.reverse(), 1);
+        this.left.replace_right(c, 1);
+        this.top.replace_bottom(d.reverse(), 1); 
     }
 
     Fi() {
@@ -152,10 +163,10 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         const c = this.bottom.get_row(this.n - 1);
         const d = this.right.get_col(this.n - 1);
 
-        this.left.replace_left(a.reverse());
-        this.bottom.replace_bottom(b);
-        this.right.replace_right(c.reverse());
-        this.top.replace_top(d);
+        this.left.replace_left(a.reverse(), 3);
+        this.bottom.replace_bottom(b, 3);
+        this.right.replace_right(c.reverse(), 3);
+        this.top.replace_top(d, 3);
     }
 
     Bi() {
@@ -291,10 +302,10 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
             const c = this.bottom.get_row(Math.floor(this.n / 2));
             const d = this.left.get_col(Math.floor(this.n / 2));
 
-            this.right.replace_middle_col(a);
-            this.bottom.replace_middle_row(b.reverse());
-            this.left.replace_middle_col(c);
-            this.top.replace_middle_row(d.reverse()); 
+            this.right.replace_middle_col(a, 1);
+            this.bottom.replace_middle_row(b.reverse(), 1);
+            this.left.replace_middle_col(c, 1);
+            this.top.replace_middle_row(d.reverse(), 1); 
         }
     }
 
