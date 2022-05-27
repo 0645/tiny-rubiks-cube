@@ -20,7 +20,7 @@ export class Project extends Scene {
     constructor() {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
-        this.model = new Model(new Rubiks(3), textures.supercube);
+        this.model = new Model(new Rubiks(3), textures.basic_look);
         this.smoothRotations = true;
         this.initial_camera_location = Mat4.look_at(vec3(16, 0, 0), vec3(0, 0, 0), vec3(0, 1, 0));
     }
@@ -28,7 +28,7 @@ export class Project extends Scene {
     make_control_panel() {
         this.key_triggered_button("F", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = 1; else this.model.cube.F(); });
         this.key_triggered_button("F'", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = -1; else this.model.cube.Fi(); });
-        this.key_triggered_button("Toggle smooth rotations", ["="], () => this.smoothRotations = !this.smoothRotations);
+        this.key_triggered_button("Toggle smooth rotations", ["="], () => { if(this.model.rotating) return; else this.smoothRotations = !this.smoothRotations; });
         this.new_line();
         this.key_triggered_button("B", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = 2; else this.model.cube.B(); });
         this.key_triggered_button("B'", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = -2; else this.model.cube.Bi(); });
@@ -56,7 +56,7 @@ export class Project extends Scene {
         this.new_line();
         this.key_triggered_button("E", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = 8; else this.model.cube.E(); });
         this.key_triggered_button("E'", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = -8; else this.model.cube.Ei(); });
-        this.key_triggered_button("Supercube", ["="], () => this.model.setMaterials(textures.supercube));
+        this.key_triggered_button("Sheperd's Cube", ["="], () => this.model.setMaterials(textures.sheperds_cube));
         this.new_line();
         this.key_triggered_button("S", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = 9; else this.model.cube.S(); });
         this.key_triggered_button("S'", ["="], () => { if(this.model.rotating) return; else if(this.smoothRotations) this.model.rotating = -9; else this.model.cube.Si(); });
@@ -75,7 +75,7 @@ export class Project extends Scene {
         if (!context.scratchpad.controls) {
             this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
             // Define the global camera and projection matrices, which are stored in program_state.
-            program_state.set_camera(Mat4.look_at(vec3(7, 7, 15), vec3(0, 0, 0), vec3(0, 1, 0)));
+            program_state.set_camera(Mat4.look_at(vec3(10, 10, 10), vec3(0, 0, 0), vec3(0, 1, 0)));
         }
 
         program_state.projection_transform = Mat4.perspective(

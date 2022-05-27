@@ -122,17 +122,26 @@ const Face = rubiks.Face = class Face {
         this.rotate_clockwise();
         this.rotate_clockwise();
     }
+
+    addAngle(theta) {
+        this.grid.forEach(row => {
+            row.forEach(element => {
+                element.angle += theta;
+                element.angle %= 4;
+            });
+        });
+    }
 }
 
 const Rubiks = rubiks.Rubiks = class Rubiks {
     constructor(n) {
         this.n = n;
-        this.front = new Face(n, 'white', 1);
-        this.back = new Face(n, 'yellow', 1);
-        this.top = new Face(n, 'blue', 2);
-        this.bottom = new Face(n, 'green', 2);
-        this.left = new Face(n, 'orange');
-        this.right = new Face(n, 'red', 2);
+        this.front = new Face(n, 'white', 0);
+        this.back = new Face(n, 'yellow', 2);
+        this.top = new Face(n, 'blue', 1);
+        this.bottom = new Face(n, 'green', 3);
+        this.left = new Face(n, 'orange', 3);
+        this.right = new Face(n, 'red', 3);
     }
 
     F() {
@@ -224,8 +233,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         const d = this.top.get_col(0);
 
         this.bottom.replace_left(a);
-        this.back.replace_right(b.reverse());
-        this.top.replace_left(c.reverse());
+        this.back.replace_right(b.reverse(), 2);
+        this.top.replace_left(c.reverse(), 2);
         this.front.replace_left(d);
     }
 
@@ -244,8 +253,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         const d = this.bottom.get_col(this.n - 1);
 
         this.top.replace_right(a);
-        this.back.replace_left(b.reverse());
-        this.bottom.replace_right(c.reverse());
+        this.back.replace_left(b.reverse(), 2);
+        this.bottom.replace_right(c.reverse(), 2);
         this.front.replace_right(d);
     }
 
@@ -263,8 +272,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
             const d = this.top.get_col(Math.floor(this.n / 2));
 
             this.bottom.replace_middle_col(a);
-            this.back.replace_middle_col(b.reverse());
-            this.top.replace_middle_col(c.reverse());
+            this.back.replace_middle_col(b.reverse(), 2);
+            this.top.replace_middle_col(c.reverse(), 2);
             this.front.replace_middle_col(d);
         }
     }
@@ -398,6 +407,9 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.back = b;
         this.bottom = c;
         this.front = d;
+
+        this.back.addAngle(2);
+        this.bottom.addAngle(2);
     }
 
     xi() {
