@@ -136,12 +136,19 @@ const Face = rubiks.Face = class Face {
 const Rubiks = rubiks.Rubiks = class Rubiks {
     constructor(n) {
         this.n = n;
+        this.rotating = false;
         this.front = new Face(n, 'white', 0);
         this.back = new Face(n, 'yellow', 2);
         this.top = new Face(n, 'blue', 1);
         this.bottom = new Face(n, 'green', 3);
         this.left = new Face(n, 'orange', 3);
         this.right = new Face(n, 'red', 3);
+    }
+
+    move(func) {
+        this.rotating = true;
+        func.bind(this)();
+        this.rotating = false;
     }
 
     F() {

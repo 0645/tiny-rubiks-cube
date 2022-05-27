@@ -389,12 +389,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case 10:
-                rotate_face('right', 'x', -theta);
-                rotate_face('front', 'x', -theta);
-                rotate_face('back', 'x', -theta);
-                rotate_face('top', 'x', -theta);
-                rotate_face('bottom', 'x', -theta);
-                rotate_face('left', 'x', -theta);
+                this.faces.forEach(face => rotate_face(face, 'x', -theta));
                 if(this.rotation_buffer.stickers.right[0][0].x < -Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.x();
@@ -402,12 +397,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case -10:
-                rotate_face('right', 'x', theta);
-                rotate_face('front', 'x', theta);
-                rotate_face('back', 'x', theta);
-                rotate_face('top', 'x', theta);
-                rotate_face('bottom', 'x', theta);
-                rotate_face('left', 'x', theta);
+                this.faces.forEach(face => rotate_face(face, 'x', theta));
                 if(this.rotation_buffer.stickers.right[0][0].x > Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.xi();
@@ -415,12 +405,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case 11:
-                rotate_face('top', 'y', -theta);
-                rotate_face('front', 'y', -theta);
-                rotate_face('back', 'y', -theta);
-                rotate_face('bottom', 'y', -theta);
-                rotate_face('left', 'y', -theta);
-                rotate_face('right', 'y', -theta);
+                this.faces.forEach(face => rotate_face(face, 'y', -theta));
                 if(this.rotation_buffer.stickers.top[0][0].y < -Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.y();
@@ -428,12 +413,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case -11:
-                rotate_face('top', 'y', theta);
-                rotate_face('front', 'y', theta);
-                rotate_face('back', 'y', theta);
-                rotate_face('bottom', 'y', theta);
-                rotate_face('left', 'y', theta);
-                rotate_face('right', 'y', theta);
+                this.faces.forEach(face => rotate_face(face, 'y', theta));
                 if(this.rotation_buffer.stickers.top[0][0].y > Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.yi();
@@ -441,12 +421,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case 12:
-                rotate_face('front', 'z', -theta);
-                rotate_face('back', 'z', -theta);
-                rotate_face('top', 'z', -theta);
-                rotate_face('bottom', 'z', -theta);
-                rotate_face('left', 'z', -theta);
-                rotate_face('right', 'z', -theta);
+                this.faces.forEach(face => rotate_face(face, 'z', -theta));
                 if(this.rotation_buffer.stickers.front[0][0].z < -Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.z();
@@ -454,12 +429,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case -12:
-                rotate_face('front', 'z', theta);
-                rotate_face('back', 'z', theta);
-                rotate_face('top', 'z', theta);
-                rotate_face('bottom', 'z', theta);
-                rotate_face('left', 'z', theta);
-                rotate_face('right', 'z', theta);
+                this.faces.forEach(face => rotate_face(face, 'z', theta));
                 if(this.rotation_buffer.stickers.front[0][0].z > Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.zi();
@@ -476,7 +446,6 @@ const Model = model.Model = class Model {
             const y_rotate = Mat4.rotation(this.angles[face].y, 0, 1, 0);
             const z_rotate = Mat4.rotation(this.angles[face].z, 0, 0, 1);
             const base_transform = x_rotate.times(y_rotate).times(z_rotate).times(Mat4.translation(0, 0, 3));
-            // TODO: Fix inside for middle rotations
             if(this.render_inside[face]) {
                 const inside_transform = Mat4.translation(0, 0, -2).times(Mat4.scale(3, 3, 3));
                 const angle = this.rotation_buffer.inside[face].x + this.rotation_buffer.inside[face].y + this.rotation_buffer.inside[face].z;
