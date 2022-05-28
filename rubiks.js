@@ -134,6 +134,7 @@ const Face = rubiks.Face = class Face {
 }
 
 const Rubiks = rubiks.Rubiks = class Rubiks {
+    // TODO: Supercube angle bugs (scramble) the cube first
     constructor(n) {
         this.n = n;
         this.rotating = false;

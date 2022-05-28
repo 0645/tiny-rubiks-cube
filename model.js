@@ -32,6 +32,7 @@ const Model = model.Model = class Model {
         this.render_inside = { front: false, back: false, top: false, bottom: false, left: false, right: false };
 
         this.stickers = { front: [], back: [], top: [], bottom: [], left: [], right: [] };
+        this.transformations = { front: [], back: [], top: [], bottom: [], left: [], right: [] };
         this.faces.forEach((face) => {
             // Generate this.inside
             this.inside[face].push(new Square());
@@ -39,11 +40,14 @@ const Model = model.Model = class Model {
 
             // Generate this.stickers
             for(let i = 0; i < this.n; i++) {
-                const row = [];
+                const r1 = [];
+                const r2 = [];
                 for(let j = 0; j < this.n; j++) {
-                    row.push(new Square());
+                    r1.push(new Square());
+                    r2.push(Mat4.identity());
                 }
-                this.stickers[face].push(row);
+                this.stickers[face].push(r1);
+                this.transformations[face].push(r2);
             }
         });
 
@@ -92,7 +96,10 @@ const Model = model.Model = class Model {
                 this.rotation_buffer.stickers[face][i][col][dimension] += theta;
             }
         }
-        const rotate_face = (face, dimension, theta) => {
+        const rotate_face = (face, dimension, theta, timing = 'linear') => {
+            const temp = Math.abs(this.rotation_buffer.stickers[face][0][0][dimension]);
+            if(timing == 'ease') theta *=  0.75 * Math.sin(2 * temp) + 0.1;
+            
             for(let i = 0; i < this.n; i++) {
                 for(let j = 0; j < this.n; j++) {
                     this.rotation_buffer.stickers[face][i][j][dimension] += theta;
@@ -389,7 +396,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case 10:
-                this.faces.forEach(face => rotate_face(face, 'x', -theta));
+                this.faces.forEach(face => rotate_face(face, 'x', -theta, 'ease'));
                 if(this.rotation_buffer.stickers.right[0][0].x < -Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.x();
@@ -397,7 +404,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case -10:
-                this.faces.forEach(face => rotate_face(face, 'x', theta));
+                this.faces.forEach(face => rotate_face(face, 'x', theta, 'ease'));
                 if(this.rotation_buffer.stickers.right[0][0].x > Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.xi();
@@ -405,7 +412,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case 11:
-                this.faces.forEach(face => rotate_face(face, 'y', -theta));
+                this.faces.forEach(face => rotate_face(face, 'y', -theta, 'ease'));
                 if(this.rotation_buffer.stickers.top[0][0].y < -Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.y();
@@ -413,7 +420,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case -11:
-                this.faces.forEach(face => rotate_face(face, 'y', theta));
+                this.faces.forEach(face => rotate_face(face, 'y', theta, 'ease'));
                 if(this.rotation_buffer.stickers.top[0][0].y > Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.yi();
@@ -421,7 +428,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case 12:
-                this.faces.forEach(face => rotate_face(face, 'z', -theta));
+                this.faces.forEach(face => rotate_face(face, 'z', -theta, 'ease'));
                 if(this.rotation_buffer.stickers.front[0][0].z < -Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.z();
@@ -429,7 +436,7 @@ const Model = model.Model = class Model {
                 }
                 break;
             case -12:
-                this.faces.forEach(face => rotate_face(face, 'z', theta));
+                this.faces.forEach(face => rotate_face(face, 'z', theta, 'ease'));
                 if(this.rotation_buffer.stickers.front[0][0].z > Math.PI / 2) {
                     this.resetRotationBuffer();
                     this.cube.zi();
@@ -470,6 +477,7 @@ const Model = model.Model = class Model {
                     }
                     const sticker_rotation = Mat4.rotation(this.cube[face].grid[i][j].angle * -Math.PI / 2, 0, 0, 1);
                     this.stickers[face][i][j].draw(context, program_state, init_rotation.times(base_transform).times(translation).times(sticker_rotation), this.materials[this.cube[face].grid[i][j].image]);
+                    this.transformations[face][i][j] = init_rotation.times(base_transform).times(translation).times(sticker_rotation);
                 }
             }
         });

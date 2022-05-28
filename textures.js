@@ -207,3 +207,13 @@ const sheperds_cube = textures.sheperds_cube = {
     orange: new Material(new Colorblind(), { color: hex_color("#ffffff"), texture: new Texture("assets/arrow.png", "NEAREST"), ...ads }),
     red: new Material(new Colorblind(), { color: hex_color("#ffffff"), texture: new Texture("assets/arrow.png", "NEAREST"), ...ads }),
 };
+
+const electric_glow = textures.electric_glow = {
+    inside: new Material(new Textured_Phong(), { color: hex_color("#000000"), }),
+    white: new Material(new Colorblind(), { color: hex_color("#ffffff"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
+    yellow: new Material(new Colorblind(), { color: hex_color("#ffff00"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
+    blue: new Material(new Colorblind(), { color: hex_color("#0000ff"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
+    green: new Material(new Colorblind(), { color: hex_color("#00ff00"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
+    orange: new Material(new Colorblind(), { color: hex_color("#ff8000"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
+    red: new Material(new Colorblind(), { color: hex_color("#ff0000"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
+};
