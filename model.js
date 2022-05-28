@@ -99,7 +99,7 @@ const Model = model.Model = class Model {
         const rotate_face = (face, dimension, theta, timing = 'linear') => {
             const temp = Math.abs(this.rotation_buffer.stickers[face][0][0][dimension]);
             if(timing == 'ease') theta *=  0.75 * Math.sin(2 * temp) + 0.1;
-            
+
             for(let i = 0; i < this.n; i++) {
                 for(let j = 0; j < this.n; j++) {
                     this.rotation_buffer.stickers[face][i][j][dimension] += theta;

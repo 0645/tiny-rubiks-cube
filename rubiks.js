@@ -123,13 +123,9 @@ const Face = rubiks.Face = class Face {
         this.rotate_clockwise();
     }
 
-    addAngle(theta) {
-        this.grid.forEach(row => {
-            row.forEach(element => {
-                element.angle += theta;
-                element.angle %= 4;
-            });
-        });
+    rotate_twice() {
+        this.rotate_clockwise();
+        this.rotate_clockwise();
     }
 }
 
@@ -402,9 +398,6 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         // rotate the entire Cube on R
         this.right.rotate_clockwise();
         this.left.rotate_counterclockwise();
-
-        this.top.grid = this.top.grid.reverse();
-        this.back.grid = this.back.grid.reverse();
         
         const a = this.front;
         const b = this.top;
@@ -416,14 +409,27 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.bottom = c;
         this.front = d;
 
-        this.back.addAngle(2);
-        this.bottom.addAngle(2);
+        this.back.rotate_twice();
+        this.bottom.rotate_twice();
     }
 
     xi() {
-        this.x();
-        this.x();
-        this.x();
+        // rotate the entire Cube on R
+        this.right.rotate_counterclockwise();
+        this.left.rotate_clockwise();
+        
+        const a = this.front;
+        const b = this.bottom;
+        const c = this.back;
+        const d = this.top;
+
+        this.bottom = a;
+        this.back = b;
+        this.top = c;
+        this.front = d;
+
+        this.back.rotate_twice();
+        this.top.rotate_twice();
     }
 
     y() {
