@@ -58,6 +58,7 @@ const Model = model.Model = class Model {
         this.resetRotationBuffer();
 
         this.materials = materials;
+        this.picked = undefined;
     }
 
     setMaterials(materials) {
@@ -79,6 +80,62 @@ const Model = model.Model = class Model {
                 this.rotation_buffer.stickers[face].push(row);
             }
         });
+    }
+
+    setPicked(ray, camera) {
+        const hits = (ray, face, i, j, square) => {
+            const M = this.transformations[face][i][j];
+
+            let normal = square.arrays.normal[0];
+            normal = M.times(normal.to4(false)).to3();
+            if(normal.dot(ray) >= 0) {
+                return false;
+            }
+            
+            const vertices = square.arrays.position
+                .map(arr => arr.to4(true))
+                .map(v => M.times(v))
+                .map(p => p.to3());
+
+            const t = (normal.dot(vertices[0]) - normal.dot(vec3(camera.x, camera.y, camera.z))) / normal.dot(ray);
+            const p = ray.times(t).plus(vec3(camera.x, camera.y, camera.z));
+
+            let angle_sum = 0;
+            let lst = [];
+            for(let i = 0; i < vertices.length; i++) {
+                
+                const v1 = vertices[i];
+                const v2 = vertices[(i + 1) % vertices.length];
+
+                const p1 = vertices[i].minus(p);
+                const p2 = vertices[(i + 1) % vertices.length].minus(p);
+
+                const m1 = p1.norm();
+                const m2 = p2.norm();
+
+                if(m1 * m2 > .0000001) {
+                    angle_sum += Math.acos(p1.dot(p2) / (m1 * m2));
+                    lst.push(Math.acos(p1.dot(p2) / (m1 * m2)));
+                }
+            }
+
+            const epsilon = 0.001;
+            return angle_sum < 2 * Math.PI + epsilon && angle_sum > 2 * Math.PI - epsilon;
+        }
+
+        for(let k = 0; k < this.faces.length; k++) {
+            const face = this.faces[k];
+            for(let i = 0; i < this.n; i++) {
+                for(let j = 0; j < this.n; j++) {
+                    const square = this.stickers[face][i][j];
+                    
+                    if(hits(ray, face, i, j, square)) {
+                        this.picked = square;
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     updateAngles(program_state) {

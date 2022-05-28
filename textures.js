@@ -302,7 +302,7 @@ const color_block = (arr, r, g, b) => {
         }
     `;
 }
-console.log(color_block([colors.white, colors.yellow, colors.blue, colors.green, colors.orange, colors.red]))
+
 class Disco extends Textured_Phong {
     fragment_glsl_code() {
         return this.shared_glsl_code() + `
