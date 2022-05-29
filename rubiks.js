@@ -133,19 +133,74 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
     // TODO: Supercube angle bugs (scramble) the cube first
     constructor(n) {
         this.n = n;
-        this.rotating = false;
         this.front = new Face(n, 'white', 0);
         this.back = new Face(n, 'yellow', 2);
         this.top = new Face(n, 'blue', 1);
         this.bottom = new Face(n, 'green', 3);
         this.left = new Face(n, 'orange', 3);
         this.right = new Face(n, 'red', 3);
+
+        this.move_history = [];
     }
 
-    move(func) {
-        this.rotating = true;
-        func.bind(this)();
-        this.rotating = false;
+    move(n) {
+        const obj = {
+            "1": this.F, "-1": this.Fi, "2": this.B, "-2": this.Bi,
+            "3": this.U, "-3": this.Ui, "4": this.D, "-4": this.Di,
+            "5": this.L, "-5": this.Li, "6": this.R, "-6": this.Ri,
+            "7": this.M, "-7": this.Mi, "8": this.E, "-8": this.Ei, "9": this.S, "-9": this.Si,
+            "10": this.x, "-10": this.xi,
+            "11": this.y, "-11": this.yi,
+            "12": this.z, "-12": this.zi,
+        };
+        obj[n].bind(this)();
+    }
+
+    random_moveset(n) {
+        let count = 0;
+        const result = [];
+        while(count < n) {
+            const move = Math.floor(Math.random() * 19) - 9;
+            const last = result.length - 1;
+            if(move != 0 && (count == 0 || result[last] != -move)) {
+                result.push(move);
+                count++;
+            }
+        }
+        return result;
+    }
+
+    scramble(n) {
+        const moveset = this.random_moveset(n);
+        for(let i = 0; i < n; i++) {
+            this.move(moveset[i]);
+        }
+        console.log(this.move_history);
+    }
+
+    optimize_move_history() {
+        let count = 0;
+        const arr1 = [];
+        const arr2 = [];
+        for(let i = 0; i < this.move_history.length; i++) {
+            if(i + 2 < this.move_history.length && this.move_history[i] == this.move_history[i+1] && this.move_history[i+1] == this.move_history[i+2]) {
+                arr1.push(-this.move_history[i]);
+                i += 2;
+            } else {
+                arr1.push(this.move_history[i]);
+            }
+        }
+        console.log(arr1);
+        for(let i = 0; i < arr1.length; i++) {
+            if(i + 1 >= arr1.length || arr1[i] != -arr1[i+1]) {
+                arr2.push(arr1[i]);
+            } else {
+                count++
+                i++;
+            }
+        }
+        this.move_history = arr2;
+        if(count != 0) this.optimize_move_history();
     }
 
     F() {
@@ -159,7 +214,9 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.right.replace_left(a, 1);
         this.bottom.replace_top(b.reverse(), 1);
         this.left.replace_right(c, 1);
-        this.top.replace_bottom(d.reverse(), 1); 
+        this.top.replace_bottom(d.reverse(), 1);
+
+        this.move_history.push(1);
     }
 
     Fi() {
@@ -180,6 +237,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.bottom.replace_bottom(b, 3);
         this.right.replace_right(c.reverse(), 3);
         this.top.replace_top(d, 3);
+
+        this.move_history.push(2);
     }
 
     Bi() {
@@ -200,6 +259,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.back.replace_top(b);
         this.right.replace_top(c);
         this.front.replace_top(d);
+
+        this.move_history.push(3);
     }
 
     Ui() {
@@ -220,6 +281,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.back.replace_bottom(b);
         this.left.replace_bottom(c)
         this.front.replace_bottom(d);
+
+        this.move_history.push(4);
     }
 
     Di() {
@@ -240,6 +303,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.back.replace_right(b.reverse(), 2);
         this.top.replace_left(c.reverse(), 2);
         this.front.replace_left(d);
+
+        this.move_history.push(5);
     }
 
     Li() {
@@ -260,6 +325,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.back.replace_left(b.reverse(), 2);
         this.bottom.replace_right(c.reverse(), 2);
         this.front.replace_right(d);
+
+        this.move_history.push(6);
     }
 
     Ri() {
@@ -279,6 +346,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
             this.back.replace_middle_col(b.reverse(), 2);
             this.top.replace_middle_col(c.reverse(), 2);
             this.front.replace_middle_col(d);
+
+            this.move_history.push(7);
         }
     }
 
@@ -299,6 +368,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
             this.back.replace_middle_row(b);
             this.left.replace_middle_row(c)
             this.front.replace_middle_row(d);
+
+            this.move_history.push(8);
         }
     }
 
@@ -319,6 +390,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
             this.bottom.replace_middle_row(b.reverse(), 1);
             this.left.replace_middle_col(c, 1);
             this.top.replace_middle_row(d.reverse(), 1); 
+
+            this.move_history.push(9);
         }
     }
 
@@ -411,6 +484,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
 
         this.back.rotate_twice();
         this.bottom.rotate_twice();
+
+        this.move_history.push(10);
     }
 
     xi() {
@@ -430,6 +505,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
 
         this.back.rotate_twice();
         this.top.rotate_twice();
+
+        this.move_history.push(-10);
     }
 
     y() {
@@ -446,6 +523,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.back = b;
         this.right = c;
         this.front = d;
+
+        this.move_history.push(11);
     }
 
     yi() {
@@ -473,6 +552,8 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         this.bottom = b;
         this.left = c;
         this.top = d;
+
+        this.move_history.push(12);
     }
 
     zi() {

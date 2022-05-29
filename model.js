@@ -59,6 +59,24 @@ const Model = model.Model = class Model {
 
         this.materials = materials;
         this.picked = null;
+        this.move_buffer = [];
+        // this.move_history = [];
+    }
+
+    smoothScramble(n) {
+        if(!this.rotating) {
+            this.move_buffer = this.move_buffer.concat(this.cube.random_moveset(n));
+            this.rotating = this.move_buffer.shift();
+        }
+    }
+
+    solve() {
+        if(!this.rotating) {
+            this.cube.optimize_move_history();
+            this.move_buffer = this.cube.move_history.map(n => -n).reverse();
+            this.rotating = this.move_buffer.shift();
+            if(this.rotating) this.solving = true;
+        }
     }
 
     setMaterials(materials) {
@@ -184,6 +202,19 @@ const Model = model.Model = class Model {
         const rotate_inside = (face, dimension, theta) => {
             this.rotation_buffer.inside[face][dimension] += theta;
         }
+        const tasks = (rotating, ...faces) => {
+            this.resetRotationBuffer();
+            // this.move_history.push(this.rotating);
+            if(!rotating && this.solving) {
+                this.solving = false;
+                this.cube.move_history = [];
+            }
+            else if (!rotating) {
+                console.log(this.cube.move_history);
+            }
+            this.rotating = rotating;
+            faces.forEach(face => this.render_inside[face] = false);
+        }
 
         switch(this.rotating) {
             case  0:
@@ -197,10 +228,8 @@ const Model = model.Model = class Model {
                 rotate_row('bottom', 0, 'z', -theta);
                 rotate_col('left', 2, 'z', -theta);
                 if(this.rotation_buffer.stickers.front[0][0].z < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.F();
-                    this.rotating = 0;
-                    this.render_inside.front = false;
+                    tasks(this.move_buffer.shift(), 'front');
                 }
                 break;
             case -1:
@@ -212,10 +241,8 @@ const Model = model.Model = class Model {
                 rotate_row('bottom', 0, 'z', theta);
                 rotate_col('left', 2, 'z', theta);
                 if(this.rotation_buffer.stickers.front[0][0].z > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.Fi();
-                    this.rotating = 0;
-                    this.render_inside.front = false;
+                    tasks(this.move_buffer.shift(), 'front');
                 }
                 break;
             case  2:
@@ -227,10 +254,8 @@ const Model = model.Model = class Model {
                 rotate_row('bottom', 2, 'z', theta);
                 rotate_col('left', 0, 'z', theta);
                 if(this.rotation_buffer.stickers.back[0][0].z > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.B();
-                    this.rotating = 0;
-                    this.render_inside.back = false;
+                    tasks(this.move_buffer.shift(), 'back');
                 }
                 break;
             case -2:
@@ -242,10 +267,8 @@ const Model = model.Model = class Model {
                 rotate_row('bottom', 2, 'z', -theta);
                 rotate_col('left', 0, 'z', -theta);
                 if(this.rotation_buffer.stickers.back[0][0].z < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.Bi();
-                    this.rotating = 0;
-                    this.render_inside.back = false;
+                    tasks(this.move_buffer.shift(), 'back');
                 }
                 break;
             case  3:
@@ -257,10 +280,8 @@ const Model = model.Model = class Model {
                 rotate_row('right', 0, 'y', -theta);
                 rotate_row('back', 0, 'y', -theta);
                 if(this.rotation_buffer.stickers.top[0][0].y < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.U();
-                    this.rotating = 0;
-                    this.render_inside.top = false;
+                    tasks(this.move_buffer.shift(), 'top');
                 }
                 break;
             case -3:
@@ -272,10 +293,8 @@ const Model = model.Model = class Model {
                 rotate_row('right', 0, 'y', theta);
                 rotate_row('back', 0, 'y', theta);
                 if(this.rotation_buffer.stickers.top[0][0].y > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.Ui();
-                    this.rotating = 0;
-                    this.render_inside.top = false;
+                    tasks(this.move_buffer.shift(), 'top')
                 }
                 break;
             case  4:
@@ -287,10 +306,8 @@ const Model = model.Model = class Model {
                 rotate_row('right', 2, 'y', theta);
                 rotate_row('back', 2, 'y', theta);
                 if(this.rotation_buffer.stickers.bottom[0][0].y > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.D();
-                    this.rotating = 0;
-                    this.render_inside.bottom = false;
+                    tasks(this.move_buffer.shift(), 'bottom');
                 }
                 break;
             case -4:
@@ -302,10 +319,8 @@ const Model = model.Model = class Model {
                 rotate_row('right', 2, 'y', -theta);
                 rotate_row('back', 2, 'y', -theta);
                 if(this.rotation_buffer.stickers.bottom[0][0].y < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.Di();
-                    this.rotating = 0;
-                    this.render_inside.bottom = false;
+                    tasks(this.move_buffer.shift(), 'bottom')
                 }
                 break;
             case  5:
@@ -317,10 +332,8 @@ const Model = model.Model = class Model {
                 rotate_col('bottom', 0, 'x', theta);
                 rotate_col('back', 2, 'x', theta);
                 if(this.rotation_buffer.stickers.left[0][0].x > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.L();
-                    this.rotating = 0;
-                    this.render_inside.left = false;
+                    tasks(this.move_buffer.shift(), 'left');
                 }
                 break;
             case -5:
@@ -332,10 +345,8 @@ const Model = model.Model = class Model {
                 rotate_col('bottom', 0, 'x', -theta);
                 rotate_col('back', 2, 'x', -theta);
                 if(this.rotation_buffer.stickers.left[0][0].x < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.Li();
-                    this.rotating = 0;
-                    this.render_inside.left = false;
+                    tasks(this.move_buffer.shift(), 'left');
                 }
                 break;
             case  6:
@@ -347,10 +358,8 @@ const Model = model.Model = class Model {
                 rotate_col('bottom', 2, 'x', -theta);
                 rotate_col('back', 0, 'x', -theta);
                 if(this.rotation_buffer.stickers.right[0][0].x < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.R();
-                    this.rotating = 0;
-                    this.render_inside.right = false;
+                    tasks(this.move_buffer.shift(), 'right');
                 }
                 break;
             case -6:
@@ -362,10 +371,8 @@ const Model = model.Model = class Model {
                 rotate_col('bottom', 2, 'x', theta);
                 rotate_col('back', 0, 'x', theta);
                 if(this.rotation_buffer.stickers.right[0][0].x > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.Ri();
-                    this.rotating = 0;
-                    this.render_inside.right = false;
+                    tasks(this.move_buffer.shift(), 'right');
                 }
                 break;
             case 7:
@@ -378,11 +385,8 @@ const Model = model.Model = class Model {
                 rotate_col('bottom', 1, 'x', theta);
                 rotate_col('back', 1, 'x', theta);
                 if(this.rotation_buffer.stickers.top[1][1].x > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.M();
-                    this.rotating = 0;
-                    this.render_inside.left = false;
-                    this.render_inside.right = false;
+                    tasks(this.move_buffer.shift(), 'left', 'right');
                 }
                 break;
             case -7:
@@ -395,11 +399,8 @@ const Model = model.Model = class Model {
                 rotate_col('bottom', 1, 'x', -theta);
                 rotate_col('back', 1, 'x', -theta);
                 if(this.rotation_buffer.stickers.top[1][1].x < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.Mi();
-                    this.rotating = 0;
-                    this.render_inside.left = false;
-                    this.render_inside.right = false;
+                    tasks(this.move_buffer.shift(), 'left', 'right');
                 }
                 break;
             case 8:
@@ -412,11 +413,8 @@ const Model = model.Model = class Model {
                 rotate_row('right', 1, 'y', theta);
                 rotate_row('back', 1, 'y', theta);
                 if(this.rotation_buffer.stickers.left[1][1].y > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.E();
-                    this.rotating = 0;
-                    this.render_inside.top = false;
-                    this.render_inside.bottom = false;
+                    tasks(this.move_buffer.shift(), 'top', 'bottom');
                 }
                 break;
             case -8:
@@ -429,11 +427,8 @@ const Model = model.Model = class Model {
                 rotate_row('right', 1, 'y', -theta);
                 rotate_row('back', 1, 'y', -theta);
                 if(this.rotation_buffer.stickers.left[1][1].y < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.Ei();
-                    this.rotating = 0;
-                    this.render_inside.top = false;
-                    this.render_inside.bottom = false;
+                    tasks(this.move_buffer.shift(), 'top', 'bottom');
                 }
                 break;
             case 9:
@@ -446,11 +441,8 @@ const Model = model.Model = class Model {
                 rotate_row('bottom', 1, 'z', -theta);
                 rotate_col('left', 1, 'z', -theta);
                 if(this.rotation_buffer.stickers.top[1][1].z < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.S();
-                    this.rotating = 0;
-                    this.render_inside.front = false;
-                    this.render_inside.back = false;
+                    tasks(this.move_buffer.shift(), 'front', 'back');
                 }
                 break;
             case -9:
@@ -463,59 +455,50 @@ const Model = model.Model = class Model {
                 rotate_row('bottom', 1, 'z', theta);
                 rotate_col('left', 1, 'z', theta);
                 if(this.rotation_buffer.stickers.top[1][1].z > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.Si();
-                    this.rotating = 0;
-                    this.render_inside.front = false;
-                    this.render_inside.back = false;
+                    tasks(this.move_buffer.shift(), 'front', 'back');
                 }
                 break;
             case 10:
                 this.faces.forEach(face => rotate_face(face, 'x', -theta, 'ease'));
                 if(this.rotation_buffer.stickers.right[0][0].x < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.x();
-                    this.rotating = 0;
+                    tasks(this.move_buffer.shift());
                 }
                 break;
             case -10:
                 this.faces.forEach(face => rotate_face(face, 'x', theta, 'ease'));
                 if(this.rotation_buffer.stickers.right[0][0].x > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.xi();
-                    this.rotating = 0;
+                    tasks(this.move_buffer.shift());
                 }
                 break;
             case 11:
                 this.faces.forEach(face => rotate_face(face, 'y', -theta, 'ease'));
                 if(this.rotation_buffer.stickers.top[0][0].y < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.y();
-                    this.rotating = 0;
+                    tasks(this.move_buffer.shift());
                 }
                 break;
             case -11:
                 this.faces.forEach(face => rotate_face(face, 'y', theta, 'ease'));
                 if(this.rotation_buffer.stickers.top[0][0].y > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.yi();
-                    this.rotating = 0;
+                    tasks(this.move_buffer.shift());
                 }
                 break;
             case 12:
                 this.faces.forEach(face => rotate_face(face, 'z', -theta, 'ease'));
                 if(this.rotation_buffer.stickers.front[0][0].z < -Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.z();
-                    this.rotating = 0;
+                    tasks(this.move_buffer.shift());
                 }
                 break;
             case -12:
                 this.faces.forEach(face => rotate_face(face, 'z', theta, 'ease'));
                 if(this.rotation_buffer.stickers.front[0][0].z > Math.PI / 2) {
-                    this.resetRotationBuffer();
                     this.cube.zi();
-                    this.rotating = 0;
+                    tasks(this.move_buffer.shift());
                 }
                 break;
         }
