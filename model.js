@@ -58,7 +58,7 @@ const Model = model.Model = class Model {
         this.resetRotationBuffer();
 
         this.materials = materials;
-        this.picked = undefined;
+        this.picked = null;
     }
 
     setMaterials(materials) {
@@ -80,6 +80,18 @@ const Model = model.Model = class Model {
                 this.rotation_buffer.stickers[face].push(row);
             }
         });
+    }
+
+    getMousePointOnPlane(ray, face, camera) {
+        // this.transformations[face][2][2];
+        const square = this.stickers[face][2][2];
+        const M = this.transformations[face][2][2];
+
+        const normal = M.times(square.arrays.normal[0].to4(false)).to3();
+        const point_on_plane = M.times(square.arrays.position[0].to4(true)).to3();
+
+        const t = (normal.dot(point_on_plane) - normal.dot(vec3(camera.x, camera.y, camera.z))) / normal.dot(ray);
+        return ray.times(t).plus(vec3(camera.x, camera.y, camera.z));
     }
 
     setPicked(ray, camera) {
@@ -130,12 +142,18 @@ const Model = model.Model = class Model {
                     const square = this.stickers[face][i][j];
                     
                     if(hits(ray, face, i, j, square)) {
-                        this.picked = square;
+                        this.picked = {
+                            face,
+                            row: i,
+                            col: j,
+                        };
                         return;
                     }
                 }
             }
         }
+
+        this.picked = null;
     }
 
     updateAngles(program_state) {
