@@ -180,17 +180,26 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
 
     optimize_move_history() {
         let count = 0;
+
+        // Remove spins at the beginning of the move history
+        while(this.move_history.length != 0 && Math.abs(this.move_history[0]) >= 10) {
+            this.move_history.shift();
+        }
+
+        // Replace 3 consecutive moves with an inverted move.
         const arr1 = [];
-        const arr2 = [];
         for(let i = 0; i < this.move_history.length; i++) {
             if(i + 2 < this.move_history.length && this.move_history[i] == this.move_history[i+1] && this.move_history[i+1] == this.move_history[i+2]) {
                 arr1.push(-this.move_history[i]);
+                count++;
                 i += 2;
             } else {
                 arr1.push(this.move_history[i]);
             }
         }
-        console.log(arr1);
+
+        // Delete moves followed by their inverse
+        const arr2 = [];
         for(let i = 0; i < arr1.length; i++) {
             if(i + 1 >= arr1.length || arr1[i] != -arr1[i+1]) {
                 arr2.push(arr1[i]);
@@ -199,7 +208,30 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
                 i++;
             }
         }
-        this.move_history = arr2;
+
+        // Replace move triplets that make a spin with that spin
+        const arr3 = [];
+        for(let i = 0; i < arr2.length; i++) {
+            if(i + 2 >= arr2.length) {
+                arr3.push(arr2[i]);
+            } else {
+                const [a, b, c] = [arr2[i], arr2[i+1], arr2[i+2]].sort((a, b) => Math.abs(a) - Math.abs(b));
+                let replaced = true;
+
+                if(a == -5 && b == 6 && c == -7) arr3.push(10);
+                else if(a == 5 && b == -6 && c == 7) arr3.push(-10);
+                else if(a == 3 && b == -4 && c == -8) arr3.push(11);
+                else if(a == -3 && b == 4 && c == 8) arr3.push(-11);
+                else if(a == 1 && b == -2 && c == 9) arr3.push(12);
+                else if(a == -1 && b == 2 && c == -9) arr3.push(-12);
+                else replaced = false;
+
+                if(replaced) i += 2;
+                else arr3.push(arr2[i]);
+            }
+        }
+
+        this.move_history = arr3;
         if(count != 0) this.optimize_move_history();
     }
 

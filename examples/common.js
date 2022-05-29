@@ -420,19 +420,19 @@ const Axis_Arrows = defs.Axis_Arrows =
         constructor() {
             super("position", "normal", "texture_coord");
             let stack = [];
-            Subdivision_Sphere.insert_transformed_copy_into(this, [3], Mat4.rotation(Math.PI / 2, 0, 1, 0).times(Mat4.scale(.25, .25, .25)));
-            this.drawOneAxis(Mat4.identity(), [[.67, 1], [0, 1]]);
-            this.drawOneAxis(Mat4.rotation(-Math.PI / 2, 1, 0, 0).times(Mat4.scale(1, -1, 1)), [[.34, .66], [0, 1]]);
-            this.drawOneAxis(Mat4.rotation(Math.PI / 2, 0, 1, 0).times(Mat4.scale(-1, 1, 1)), [[0, .33], [0, 1]]);
+            // Subdivision_Sphere.insert_transformed_copy_into(this, [3], Mat4.rotation(Math.PI / 2, 0, 1, 0).times(Mat4.scale(.25, .25, .25)));
+            this.drawOneAxis(Mat4.identity(), [[.67, 1], [0, 1]], 2);
+            this.drawOneAxis(Mat4.rotation(-Math.PI / 2, 1, 0, 0).times(Mat4.scale(1, -1, 1)), [[.34, .66], [0, 1]], 1.25);
+            this.drawOneAxis(Mat4.rotation(Math.PI / 2, 0, 1, 0).times(Mat4.scale(-1, 1, 1)), [[0, .33], [0, 1]], 2);
         }
 
-        drawOneAxis(transform, tex) {
+        drawOneAxis(transform, tex, length) {
             // Use a different texture coordinate range for each of the three axes, so they show up differently.
-            Closed_Cone.insert_transformed_copy_into(this, [4, 10, tex], transform.times(Mat4.translation(0, 0, 2)).times(Mat4.scale(.25, .25, .25)));
-            Cube.insert_transformed_copy_into(this, [], transform.times(Mat4.translation(.95, .95, .45)).times(Mat4.scale(.05, .05, .45)));
-            Cube.insert_transformed_copy_into(this, [], transform.times(Mat4.translation(.95, 0, .5)).times(Mat4.scale(.05, .05, .4)));
-            Cube.insert_transformed_copy_into(this, [], transform.times(Mat4.translation(0, .95, .5)).times(Mat4.scale(.05, .05, .4)));
-            Cylindrical_Tube.insert_transformed_copy_into(this, [7, 7, tex], transform.times(Mat4.translation(0, 0, 1)).times(Mat4.scale(.1, .1, 2)));
+            Closed_Cone.insert_transformed_copy_into(this, [4, 10, tex], transform.times(Mat4.translation(0, 0, length)).times(Mat4.scale(.05, .05, .05)));
+            // Cube.insert_transformed_copy_into(this, [], transform.times(Mat4.translation(.95, .95, .45)).times(Mat4.scale(.05, .05, .45)));
+            // Cube.insert_transformed_copy_into(this, [], transform.times(Mat4.translation(.95, 0, .5)).times(Mat4.scale(.05, .05, .4)));
+            // Cube.insert_transformed_copy_into(this, [], transform.times(Mat4.translation(0, .95, .5)).times(Mat4.scale(.05, .05, .4)));
+            Cylindrical_Tube.insert_transformed_copy_into(this, [7, 7, tex], transform.times(Mat4.translation(0, 0, length / 2)).times(Mat4.scale(.01, .01, length)));
         }
     }
 

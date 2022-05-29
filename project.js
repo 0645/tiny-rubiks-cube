@@ -7,7 +7,7 @@ const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
 } = tiny;
 
-const {Square, Cube, Axis_Arrows, Phong_Shader, Textured_Phong} = defs;
+const {Square, Cube, Axis_Arrows, Basic_Shader, Phong_Shader, Textured_Phong} = defs;
 
 const {Rubiks} = rubiks;
 const {Model} = model;
@@ -27,11 +27,15 @@ export class Project extends Scene {
             x: 10,
             y: 10,
             z: 10,
-        }
+        };
         this.initial_camera_location = Mat4.look_at(vec3(this.camera.x, this.camera.y, this.camera.z), vec3(0, 0, 0), vec3(0, 1, 0));
         // this.initial_camera_location = Mat4.look_at(vec3(0, 0, 10), vec3(0, 0, 0), vec3(0, 1, 0));
         
         this.mouse_enabled_canvases = new Set();
+
+        this.showAxis = false;
+        this.axis = new Axis_Arrows();
+        this.axis_material = new Material(new Textured_Phong(), { color: hex_color("#ffff00") })
     }
 
     try_moving(rotate_number, rotate_function) {
@@ -44,37 +48,38 @@ export class Project extends Scene {
 
     make_control_panel() {
         const makeMoveButton = (description, shortcut_combination, rotate_number, rotate_function) => {
-            this.key_triggered_button(description, [shortcut_combination], () => {
+            this.key_triggered_button(description, shortcut_combination, () => {
                 this.try_moving(rotate_number, rotate_function);
             });
         };
-        makeMoveButton("L", "=", 5, this.model.cube.L); makeMoveButton("L'", "=", -5, this.model.cube.Li);
-        makeMoveButton("R", "=", 6, this.model.cube.R); makeMoveButton("R'", "=", -6, this.model.cube.Ri);
-        makeMoveButton("M", "=", 7, this.model.cube.M); makeMoveButton("M'", "=", -7, this.model.cube.Mi);
-        makeMoveButton("x", "=", 10, this.model.cube.x); makeMoveButton("x'", "=", -10, this.model.cube.xi);
+        makeMoveButton("L", ["l"], 5, this.model.cube.L); makeMoveButton("L'", ["Shift", "L"], -5, this.model.cube.Li);
+        makeMoveButton("R", ["r"], 6, this.model.cube.R); makeMoveButton("R'", ["Shift", "R"], -6, this.model.cube.Ri);
+        makeMoveButton("M", ["m"], 7, this.model.cube.M); makeMoveButton("M'", ["Shift", "M"], -7, this.model.cube.Mi);
         this.new_line();
-        makeMoveButton("U", "=", 3, this.model.cube.U); makeMoveButton("U'", "=", -3, this.model.cube.Ui);
-        makeMoveButton("D", "=", 4, this.model.cube.D); makeMoveButton("D'", "=", -4, this.model.cube.Di);
-        makeMoveButton("E", "=", 8, this.model.cube.E); makeMoveButton("E'", "=", -8, this.model.cube.Ei);
-        makeMoveButton("y", "=", 11, this.model.cube.y); makeMoveButton("y'", "=", -11, this.model.cube.yi);
+        makeMoveButton("U", ["u"], 3, this.model.cube.U); makeMoveButton("U'", ["Shift", "U"], -3, this.model.cube.Ui);
+        makeMoveButton("D", ["d"], 4, this.model.cube.D); makeMoveButton("D'", ["Shift", "D"], -4, this.model.cube.Di);
+        makeMoveButton("E", ["e"], 8, this.model.cube.E); makeMoveButton("E'", ["Shift", "E"], -8, this.model.cube.Ei);
         this.new_line();
-        makeMoveButton("F", "=", 1, this.model.cube.F); makeMoveButton("F'", "=", -1, this.model.cube.Fi);
-        makeMoveButton("B", "=", 2, this.model.cube.B); makeMoveButton("B'", "=", -2, this.model.cube.Bi);
-        makeMoveButton("S", "=", 9, this.model.cube.S); makeMoveButton("S'", "=", -9, this.model.cube.Si);
-        makeMoveButton("z", "=", 12, this.model.cube.z); makeMoveButton("z'", "=", -12, this.model.cube.zi);
+        makeMoveButton("F", ["f"], 1, this.model.cube.F); makeMoveButton("F'", ["Shift", "F"], -1, this.model.cube.Fi);
+        makeMoveButton("B", ["b"], 2, this.model.cube.B); makeMoveButton("B'", ["Shift", "B"], -2, this.model.cube.Bi);
+        makeMoveButton("S", ["s"], 9, this.model.cube.S); makeMoveButton("S'", ["Shift", "S"], -9, this.model.cube.Si);
+        this.new_line();
+        makeMoveButton("x", ["x"], 10, this.model.cube.x); makeMoveButton("x'", ["Shift", "X"], -10, this.model.cube.xi);
+        makeMoveButton("y", ["y"], 11, this.model.cube.y); makeMoveButton("y'", ["Shift", "Y"], -11, this.model.cube.yi);
+        makeMoveButton("z", ["z"], 12, this.model.cube.z); makeMoveButton("z'", ["Shift", "Z"], -12, this.model.cube.zi);
         this.new_line();
         this.new_line();
         this.key_triggered_button("Scramble", ["="], () => {
-            if(!this.smoothRotations) {
+            if(!this.smoothRotations && !this.model.rotating) {
                 this.model.cube.scramble(20);
             } else if(!this.model.rotating) {
                 this.model.smoothScramble(20);
             }
         });
         this.key_triggered_button("Solve", ["="], () => {
-            if(!this.smoothRotations) {
+            if(!this.smoothRotations && !this.model.rotating) {
                 this.model.cube = new Rubiks(3);
-            } else {
+            } else if(!this.model.rotating) {
                 this.model.solve();
             }
         });
@@ -84,16 +89,17 @@ export class Project extends Scene {
             else
                 this.smoothRotations = !this.smoothRotations;
         });
-        this.key_triggered_button("Basic Look", ["="], () => this.model.setMaterials(textures.basic_look));
-        this.key_triggered_button("Light Mode", ["="], () => this.model.setMaterials(textures.light_mode));
-        this.key_triggered_button("Inverted", ["="], () => this.model.setMaterials(textures.inverted));
-        this.key_triggered_button("Dodo", ["="], () => this.model.setMaterials(textures.dodo));
+        this.key_triggered_button("Toggle axis", ["a"], () => this.showAxis = !this.showAxis);
+        this.key_triggered_button("Basic Look", ["1"], () => this.model.setMaterials(textures.basic_look));
+        this.key_triggered_button("Light Mode", ["2"], () => this.model.setMaterials(textures.light_mode));
+        this.key_triggered_button("Inverted", ["3"], () => this.model.setMaterials(textures.inverted));
+        this.key_triggered_button("Dodo", ["7"], () => this.model.setMaterials(textures.dodo));
         this.key_triggered_button("Stickerless", ["="], () => this.model.setMaterials(textures.stickerless));
-        this.key_triggered_button("Colorblind", ["="], () => this.model.setMaterials(textures.colorblind));
-        this.key_triggered_button("Sheperd's Cube", ["="], () => this.model.setMaterials(textures.sheperds_cube));
-        this.key_triggered_button("Electric Glow", ["="], () => this.model.setMaterials(textures.electric_glow));
-        this.key_triggered_button("Alvin's Cube", ["="], () => this.model.setMaterials(textures.alvins_cube));
-        this.key_triggered_button("Disco", ["="], () => this.model.setMaterials(textures.disco));
+        this.key_triggered_button("Colorblind", ["6"], () => this.model.setMaterials(textures.colorblind));
+        this.key_triggered_button("Sheperd's Cube", ["5"], () => this.model.setMaterials(textures.sheperds_cube));
+        this.key_triggered_button("Electric Glow", ["4"], () => this.model.setMaterials(textures.electric_glow));
+        this.key_triggered_button("Alvin's Cube", ["8"], () => this.model.setMaterials(textures.alvins_cube));
+        this.key_triggered_button("Disco", ["9"], () => this.model.setMaterials(textures.disco));
     }
 
     display(context, program_state) {
@@ -121,6 +127,7 @@ export class Project extends Scene {
         let model_transform = Mat4.identity();
 
         this.model.render(context, program_state);
+        if(this.showAxis) this.axis.draw(context, program_state, Mat4.scale(5, 5, 5), this.axis_material);
     }
 
     add_mouse_controls(canvas) {
