@@ -26,8 +26,8 @@ export class Project extends Scene {
         this.smoothRotations = true;
 
         this.camera = {
-            x: 8,
-            y: 8,
+            x: 10,
+            y: 10,
             z: 15,
         };
         this.initial_camera_location = Mat4.look_at(vec3(this.camera.x, this.camera.y, this.camera.z), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -39,8 +39,12 @@ export class Project extends Scene {
         this.axis = new Axis_Arrows();
         this.axis_material = new Material(new Textured_Phong(), { color: hex_color("#ffff00") });
         
-        this.background = new Cube();
-        this.background_material = new Material(new Textured_Phong(), { color: hex_color("#ffffff") });
+        this.background = new Square();
+        this.background_material = new Material(new Textured_Phong(), { 
+            color: hex_color("#2774AE"),
+            texture: new Texture("assets/cb_white.png", "NEAREST"),
+            ambient: 0.25, diffusivity: 1, specularity: 0,
+        });
     }
 
     try_moving(rotate_number, rotate_function) {
@@ -74,27 +78,30 @@ export class Project extends Scene {
         makeMoveButton("z", ["z"], 12, this.model.cube.z); makeMoveButton("z'", ["Shift", "Z"], -12, this.model.cube.zi);
         this.new_line();
         this.new_line();
-        this.key_triggered_button("Scramble", ["="], () => {
+        this.key_triggered_button("Scramble", ["-"], () => {
             if(!this.smoothRotations && !this.model.rotating) {
                 this.model.cube.scramble(20);
             } else if(!this.model.rotating) {
                 this.model.smoothScramble(20);
             }
         });
-        this.key_triggered_button("Solve", ["="], () => {
+        this.key_triggered_button("Solve", ["+"], () => {
             if(!this.smoothRotations && !this.model.rotating) {
                 this.model.cube = new Rubiks(3);
             } else if(!this.model.rotating) {
                 this.model.solve();
             }
         });
-        this.key_triggered_button("Toggle smooth rotations", ["="], () => {
+        this.key_triggered_button("Toggle axis", ["a"], () => this.showAxis = !this.showAxis);
+        this.key_triggered_button("Toggle smooth rotations", ["t"], () => {
             if(this.model.rotating || this.model.cube.rotating)
                 return;
             else
                 this.smoothRotations = !this.smoothRotations;
         });
-        this.key_triggered_button("Toggle axis", ["a"], () => this.showAxis = !this.showAxis);
+        this.new_line();
+        this.new_line();
+
         this.key_triggered_button("Basic Look", ["1"], () => {
             this.model.setMaterials(textures.basic_look);
             this.texture = "basic_look";
@@ -103,29 +110,29 @@ export class Project extends Scene {
             this.model.setMaterials(textures.light_mode);
             this.texture = "light_mode";
         });
-        this.key_triggered_button("Inverted", ["3"], () => {
-            this.model.setMaterials(textures.inverted);
-            this.texture = "inverted";
-        });
-        this.key_triggered_button("Dodo", ["7"], () => {
-            this.model.setMaterials(textures.dodo);
-            this.texture = "dodo";
-        });
-        this.key_triggered_button("Stickerless", ["="], () => {
+        this.key_triggered_button("Stickerless", ["3"], () => {
             this.model.setMaterials(textures.stickerless);
             this.texture = "stickerless";
         });
-        this.key_triggered_button("Colorblind", ["6"], () => {
-            this.model.setMaterials(textures.colorblind);
-            this.texture = "colorblind";
+        this.new_line();
+
+        this.key_triggered_button("Electric Glow", ["4"], () => {
+            this.model.setMaterials(textures.electric_glow);
+            this.texture = "electric_glow";
         });
         this.key_triggered_button("Sheperd's Cube", ["5"], () => {
             this.model.setMaterials(textures.sheperds_cube);
             this.texture = "sheperds_cube";
         });
-        this.key_triggered_button("Electric Glow", ["4"], () => {
-            this.model.setMaterials(textures.electric_glow);
-            this.texture = "electric_glow";
+        this.key_triggered_button("Colorblind", ["6"], () => {
+            this.model.setMaterials(textures.colorblind);
+            this.texture = "colorblind";
+        });
+        this.new_line();
+
+        this.key_triggered_button("Blindfolded", ["7"], () => {
+            this.model.setMaterials(textures.dodo);
+            this.texture = "dodo";
         });
         this.key_triggered_button("Alvin's Cube", ["8"], () => {
             this.model.setMaterials(textures.alvins_cube);
@@ -169,11 +176,12 @@ export class Project extends Scene {
         this.model.render(context, program_state);
         if(this.showAxis) this.axis.draw(context, program_state, Mat4.scale(5, 5, 5), this.axis_material);
 
-        // this.background.draw(context, program_state, Mat4.scale(11, 11, 11), this.background_material);
-    }
-
-    show_explanation(document_element) {
-        document_element.innerHTML += `<h1><center>Tiny Rubik's Cube</center></h1>`;
+        let background_transform = Mat4.identity();
+        background_transform = background_transform.times(Mat4.translation(-5, -5, -5));
+        background_transform = background_transform.times(Mat4.rotation(Math.atan(this.camera.x / this.camera.z), 0, 1, 0));
+        background_transform = background_transform.times(Mat4.rotation(Math.atan(- this.camera.y / this.camera.z), 1, 0, 0));
+        background_transform = background_transform.times(Mat4.scale(25, 25, 25));
+        this.background.draw(context, program_state, background_transform, this.background_material);
     }
 
     add_mouse_controls(canvas) {
