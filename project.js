@@ -2,6 +2,7 @@ import {defs, tiny} from './examples/common.js';
 import {rubiks} from './rubiks.js';
 import {model} from './model.js';
 import {textures} from './textures.js';
+import {info} from './information.js';
 
 const {
     Vector, Vector3, vec, vec3, vec4, color, hex_color, Shader, Matrix, Mat4, Light, Shape, Material, Scene, Texture,
@@ -21,12 +22,13 @@ export class Project extends Scene {
         // constructor(): Scenes begin by populating initial values like the Shapes and Materials they'll need.
         super();
         this.model = new Model(new Rubiks(3), textures.basic_look);
+        this.texture = "basic_look";
         this.smoothRotations = true;
 
         this.camera = {
-            x: 10,
-            y: 10,
-            z: 10,
+            x: 8,
+            y: 8,
+            z: 15,
         };
         this.initial_camera_location = Mat4.look_at(vec3(this.camera.x, this.camera.y, this.camera.z), vec3(0, 0, 0), vec3(0, 1, 0));
         // this.initial_camera_location = Mat4.look_at(vec3(0, 0, 10), vec3(0, 0, 0), vec3(0, 1, 0));
@@ -35,7 +37,10 @@ export class Project extends Scene {
 
         this.showAxis = false;
         this.axis = new Axis_Arrows();
-        this.axis_material = new Material(new Textured_Phong(), { color: hex_color("#ffff00") })
+        this.axis_material = new Material(new Textured_Phong(), { color: hex_color("#ffff00") });
+        
+        this.background = new Cube();
+        this.background_material = new Material(new Textured_Phong(), { color: hex_color("#ffffff") });
     }
 
     try_moving(rotate_number, rotate_function) {
@@ -90,16 +95,46 @@ export class Project extends Scene {
                 this.smoothRotations = !this.smoothRotations;
         });
         this.key_triggered_button("Toggle axis", ["a"], () => this.showAxis = !this.showAxis);
-        this.key_triggered_button("Basic Look", ["1"], () => this.model.setMaterials(textures.basic_look));
-        this.key_triggered_button("Light Mode", ["2"], () => this.model.setMaterials(textures.light_mode));
-        this.key_triggered_button("Inverted", ["3"], () => this.model.setMaterials(textures.inverted));
-        this.key_triggered_button("Dodo", ["7"], () => this.model.setMaterials(textures.dodo));
-        this.key_triggered_button("Stickerless", ["="], () => this.model.setMaterials(textures.stickerless));
-        this.key_triggered_button("Colorblind", ["6"], () => this.model.setMaterials(textures.colorblind));
-        this.key_triggered_button("Sheperd's Cube", ["5"], () => this.model.setMaterials(textures.sheperds_cube));
-        this.key_triggered_button("Electric Glow", ["4"], () => this.model.setMaterials(textures.electric_glow));
-        this.key_triggered_button("Alvin's Cube", ["8"], () => this.model.setMaterials(textures.alvins_cube));
-        this.key_triggered_button("Disco", ["9"], () => this.model.setMaterials(textures.disco));
+        this.key_triggered_button("Basic Look", ["1"], () => {
+            this.model.setMaterials(textures.basic_look);
+            this.texture = "basic_look";
+        });
+        this.key_triggered_button("Light Mode", ["2"], () => {
+            this.model.setMaterials(textures.light_mode);
+            this.texture = "light_mode";
+        });
+        this.key_triggered_button("Inverted", ["3"], () => {
+            this.model.setMaterials(textures.inverted);
+            this.texture = "inverted";
+        });
+        this.key_triggered_button("Dodo", ["7"], () => {
+            this.model.setMaterials(textures.dodo);
+            this.texture = "dodo";
+        });
+        this.key_triggered_button("Stickerless", ["="], () => {
+            this.model.setMaterials(textures.stickerless);
+            this.texture = "stickerless";
+        });
+        this.key_triggered_button("Colorblind", ["6"], () => {
+            this.model.setMaterials(textures.colorblind);
+            this.texture = "colorblind";
+        });
+        this.key_triggered_button("Sheperd's Cube", ["5"], () => {
+            this.model.setMaterials(textures.sheperds_cube);
+            this.texture = "sheperds_cube";
+        });
+        this.key_triggered_button("Electric Glow", ["4"], () => {
+            this.model.setMaterials(textures.electric_glow);
+            this.texture = "electric_glow";
+        });
+        this.key_triggered_button("Alvin's Cube", ["8"], () => {
+            this.model.setMaterials(textures.alvins_cube);
+            this.texture = "alvins_cube";
+        });
+        this.key_triggered_button("Disco", ["9"], () => {
+            this.model.setMaterials(textures.disco);
+            this.texture = "disco";
+        });
     }
 
     display(context, program_state) {
@@ -110,8 +145,13 @@ export class Project extends Scene {
 
         if (!context.scratchpad.controls) {
             // this.children.push(context.scratchpad.controls = new defs.Movement_Controls());
+            this.children.push(context.scratchpad.controls = new info.Information(this.model, this.smoothRotations, this.showAxis, this.texture));
             // Define the global camera and projection matrices, which are stored in program_state.
             program_state.set_camera(this.initial_camera_location);
+        } else {
+            this.children[0].smoothRotations = this.smoothRotations;
+            this.children[0].showAxis = this.showAxis;
+            this.children[0].texture = this.texture;
         }
 
         program_state.projection_transform = Mat4.perspective(
@@ -119,8 +159,8 @@ export class Project extends Scene {
         this.projection_transform = program_state.projection_transform;
 
         program_state.lights = [
-            new Light(vec4(10, 10, 10, 1), color(1, 1, 1, 1), 10000),
-            new Light(vec4(-10, -10, -10, 1), color(1, 1, 1, 1), 10000),
+            new Light(vec4(10, 8, 0, 1), color(1, 1, 1, 1), 150),
+            new Light(vec4(0, 8, 10, 1), color(1, 1, 1, 1), 150),
         ]
 
         let t = program_state.animation_time / 1000, dt = program_state.animation_delta_time / 1000;
@@ -128,6 +168,12 @@ export class Project extends Scene {
 
         this.model.render(context, program_state);
         if(this.showAxis) this.axis.draw(context, program_state, Mat4.scale(5, 5, 5), this.axis_material);
+
+        // this.background.draw(context, program_state, Mat4.scale(11, 11, 11), this.background_material);
+    }
+
+    show_explanation(document_element) {
+        document_element.innerHTML += `<h1><center>Tiny Rubik's Cube</center></h1>`;
     }
 
     add_mouse_controls(canvas) {
@@ -281,6 +327,7 @@ export class Project extends Scene {
                     this.try_moving(10, this.model.cube.x);
                 }
             }
+            this.model.picked = null;
         });
         canvas.addEventListener("mousedown", e => {
             e.preventDefault();
@@ -300,6 +347,7 @@ export class Project extends Scene {
         canvas.addEventListener("mouseout", e => {
             // if (!this.mouse.anchor) this.mouse.from_center.scale_by(0)
             this.firstPressPos = null;
+            this.model.picked = null;
         });
     }
 }

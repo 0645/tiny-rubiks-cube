@@ -209,9 +209,6 @@ const Model = model.Model = class Model {
                 this.solving = false;
                 this.cube.move_history = [];
             }
-            else if (!rotating) {
-                console.log(this.cube.move_history);
-            }
             this.rotating = rotating;
             faces.forEach(face => this.render_inside[face] = false);
         }

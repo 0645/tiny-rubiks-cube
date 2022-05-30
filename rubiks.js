@@ -127,6 +127,31 @@ const Face = rubiks.Face = class Face {
         this.rotate_clockwise();
         this.rotate_clockwise();
     }
+
+    isSolved(superface) {
+        const image = this.grid[0][0].image;
+
+        for(let i = 0; i < this.n; i++) {
+            for(let j = 0; j < this.n; j++) {
+                if(this.grid[i][j].image != image) {
+                    return false;
+                }
+            }
+        }
+
+        if(superface) {
+            const angle = this.grid[0][0].angle;
+            for(let i = 0; i < this.n; i++) {
+                for(let j = 0; j < this.n; j++) {
+                    if(this.grid[i][j].angle != angle) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
 }
 
 const Rubiks = rubiks.Rubiks = class Rubiks {
@@ -176,6 +201,16 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
             this.move(moveset[i]);
         }
         console.log(this.move_history);
+    }
+
+    isSolved(supercube) {
+        let result = true;
+
+        const faces = ["front", "back", "top", "bottom", "left", "right"];
+        
+        faces.forEach(face => { result = result && this[face].isSolved(supercube) });
+
+        return result;
     }
 
     optimize_move_history() {

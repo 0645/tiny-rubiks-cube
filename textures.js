@@ -140,25 +140,6 @@ const inverted = textures.inverted = {
     red: new Material(new Inverted(), { color: hex_color("#ff0000"), texture, ...ads}),
 };
 
-class Electric_Glow extends Textured_Phong {
-    fragment_glsl_code() {
-        return this.shared_glsl_code() + `
-            varying vec2 f_tex_coord;
-            uniform sampler2D texture;
-            uniform float animation_time;
-            
-            void main(){
-                // Sample the texture image in the correct place:
-                vec4 tex_color = texture2D( texture, f_tex_coord );
-                if( tex_color.w < .01 ) discard;
-                                                                         // Compute an initial (ambient) color:
-                gl_FragColor = vec4( ( tex_color.xyz + shape_color.xyz ) * ambient, shape_color.w * tex_color.w ); 
-                                                                         // Compute the final color with contributions from lights:
-                gl_FragColor.xyz += phong_model_lights( normalize( N ), vertex_worldspace );
-        } `;
-    }
-}
-
 class Silhouette extends Textured_Phong {
     fragment_glsl_code() {
         return this.shared_glsl_code() + `
@@ -208,14 +189,17 @@ const sheperds_cube = textures.sheperds_cube = {
     red: new Material(new Silhouette(), { color: hex_color("#ffffff"), texture: new Texture("assets/arrow.png", "NEAREST"), ...ads }),
 };
 
+const electric_glow_ads = {
+    ambient: .3, diffusivity: 1, specularity: 1,
+};
 const electric_glow = textures.electric_glow = {
     inside: new Material(new Textured_Phong(), { color: hex_color("#000000"), }),
-    white: new Material(new Silhouette(), { color: hex_color("#ffffff"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
-    yellow: new Material(new Silhouette(), { color: hex_color("#ffff00"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
-    blue: new Material(new Silhouette(), { color: hex_color("#0000ff"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
-    green: new Material(new Silhouette(), { color: hex_color("#00ff00"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
-    orange: new Material(new Silhouette(), { color: hex_color("#ff8000"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
-    red: new Material(new Silhouette(), { color: hex_color("#ff0000"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...ads }),
+    white: new Material(new Silhouette(), { color: hex_color("#ffffff"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...electric_glow_ads }),
+    yellow: new Material(new Silhouette(), { color: hex_color("#ffff00"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...electric_glow_ads }),
+    blue: new Material(new Silhouette(), { color: hex_color("#0000ff"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...electric_glow_ads }),
+    green: new Material(new Silhouette(), { color: hex_color("#00ff00"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...electric_glow_ads }),
+    orange: new Material(new Silhouette(), { color: hex_color("#ff8000"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...electric_glow_ads }),
+    red: new Material(new Silhouette(), { color: hex_color("#ff0000"), texture: new Texture("assets/electric_glow.png", "NEAREST"), ...electric_glow_ads }),
 };
 
 class Rotating_Silhouette extends Textured_Phong {
