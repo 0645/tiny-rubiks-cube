@@ -30,10 +30,10 @@ const Information = info.Information =
             const color_map = {
                 white: '#ffffff',
                 yellow: '#ffd500',
-                blue: '#004fc7',
-                green: '#009b48',
-                orange: '#ff5900',
-                red: '#d30000'
+                blue: '#0064fa',
+                green: '#00e86c',
+                orange: '#ff8b4d',
+                red: '#ff0606'
             };
 
             const button = this.control_panel.appendChild(document.createElement("button"));
@@ -55,7 +55,16 @@ const Information = info.Information =
                     'z-index': "0", 'transform': "scale(1)"
                 });
                 if (!release_event) return;
-                release_event.call(this);
+                (() => {
+                    switch(this.model.cube[face].grid[i][j].image) {
+                        case 'white': this.model.cube[face].grid[i][j].image = 'yellow'; break;
+                        case 'yellow': this.model.cube[face].grid[i][j].image = 'blue'; break;
+                        case 'blue': this.model.cube[face].grid[i][j].image = 'green'; break;
+                        case 'green': this.model.cube[face].grid[i][j].image = 'orange'; break;
+                        case 'orange': this.model.cube[face].grid[i][j].image = 'red'; break;
+                        case 'red': this.model.cube[face].grid[i][j].image = 'white'; break;
+                    }
+                }).call(this);
             };
             button.addEventListener("mousedown", press);
             button.addEventListener("mouseup", release);
@@ -68,11 +77,6 @@ const Information = info.Information =
 
         printFlatCube() {
             const addIndent = (n) => {
-                // for(let i = 0; i < n; i++) {
-                //     const indent = this.control_panel.appendChild(document.createElement("span"));
-                //     indent.style['padding-left'] = '1.85rem';
-                //     indent.style['padding-right'] = '1.85rem';
-                // }
                 const indent = this.control_panel.appendChild(document.createElement("span"));
                 indent.style['padding-left'] = n;
                 indent.style['padding-right'] = n;
@@ -86,10 +90,13 @@ const Information = info.Information =
                 }
                 addIndent('4.7rem');
                 if(i == 1) {
-                    
+                    this.live_string(box => box.textContent = `is_solved = ${this.model.cube.isSolved(false)}`);
                 }
                 else if(i == 2) {
-                    this.live_string(box => box.textContent = `is_solved = ${this.model.cube.isSolved(false)}`);
+                    this.live_string(box => box.textContent = `mouse_picking = ${this.model.picked ? this.model.picked.face
+                        + '[' + this.model.picked.row + ']'
+                        + '[' + this.model.picked.col + ']'
+                        : 'N/A'}`);
                 }
                 this.new_line();
             }
@@ -101,20 +108,17 @@ const Information = info.Information =
                     for(let j = 0; j < this.model.n; j++) {
                         this.sticker_button(face, i, j, () => {}, this.model.cube[face].grid[i][j].image, () => {});
                         if(face == 'back' && i == 0 && j == 2) {
-                            addIndent('1rem');
-                            this.live_string(box => box.textContent = `mouse_picking = ${this.model.picked ? this.model.picked.face
-                                + '[' + this.model.picked.row + ']'
-                                + '[' + this.model.picked.col + ']'
-                                : 'N/A'}`);
-                        } else if (face == 'back' && i == 1 && j == 2) {
-                            addIndent('1rem');
+                            addIndent('0.95rem');
                             const arr = ['N/A', 'Front', 'Back', 'Up', 'Down', 'Left', 'Right', 'Middle', 'Equator', 'Standing', 'x-Axis', 'y-Axis', 'z-Axis'];
                             this.live_string(box => box.textContent = `rotating = ${this.model.rotating ?
                                 (arr[Math.abs(this.model.rotating)]) + ' (' + (arr[Math.abs(this.model.rotating)][0]) +(this.model.rotating > 0 ? ")" : "')") :
                                 'N/A'}`);
-                        } else if (face == 'back' && j == 2) {
-                            addIndent('1rem');
+                        } else if (face == 'back' && i == 1 && j == 2) {
+                            addIndent('0.95rem');
                             this.live_string(box => box.textContent = `showing_axis = ${this.showAxis}`);
+                        } else if (face == 'back' && j == 2) {
+                            addIndent('0.95rem');
+                            this.live_string(box => box.textContent = `smooth_rotations = ${this.smoothRotations}`);
                         }
                     }
                 })
@@ -129,10 +133,10 @@ const Information = info.Information =
                 }
                 addIndent('4.7rem');
                 if(i == 0) {
-                    this.live_string(box => box.textContent = `smooth_rotations = ${this.smoothRotations}`);
+                    this.live_string(box => box.textContent = `texture = ${this.texture}`);
                 }
                 else if(i == 1) {
-                    this.live_string(box => box.textContent = `texture = ${this.texture}`);
+                    this.live_string(box => box.textContent = `valid_puzzle = ${this.model.cube.isValidPuzzle()}`);
                 }
                 this.new_line();
             }

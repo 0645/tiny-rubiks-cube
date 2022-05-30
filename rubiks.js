@@ -213,6 +213,29 @@ const Rubiks = rubiks.Rubiks = class Rubiks {
         return result;
     }
 
+    isValidPuzzle() {
+        let result = true;
+        const faces = ["front", "back", "top", "bottom", "left", "right"];
+        const colors = ["white", "yellow", "blue", "green", "orange", "red"];
+
+        const count = {
+            white: 0, yellow: 0, blue: 0,
+            green: 0, orange: 0, red: 0
+        };
+        
+        faces.forEach(face => { 
+            for(let i = 0; i < this.n; i++) {
+                for(let j = 0; j < this.n; j++) {
+                    count[this[face].grid[i][j].image]++;
+                }
+            }
+        });
+
+        colors.forEach(color => { result = result && !(count[color] % 9); });
+
+        return result;
+    }
+
     optimize_move_history() {
         let count = 0;
 
