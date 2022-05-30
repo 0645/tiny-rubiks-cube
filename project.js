@@ -26,9 +26,9 @@ export class Project extends Scene {
         this.smoothRotations = true;
 
         this.camera = {
-            x: 10,
-            y: 10,
-            z: 15,
+            x: 9,
+            y: 9,
+            z: 14,
         };
         this.initial_camera_location = Mat4.look_at(vec3(this.camera.x, this.camera.y, this.camera.z), vec3(0, 0, 0), vec3(0, 1, 0));
         // this.initial_camera_location = Mat4.look_at(vec3(0, 0, 10), vec3(0, 0, 0), vec3(0, 1, 0));
